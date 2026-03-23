@@ -4,6 +4,23 @@
 #include <sys/stat.h>
 #include <errno.h>
 
+
+struct Blob{
+    char* data;
+};
+
+struct Node{
+    char* name;
+    struct Node* subDir;
+};
+
+struct Commit{
+    char* message;
+    char* author;
+    char* commiter;
+    struct Commit* parent;
+};
+
 int main(int argc, char *argv[]) {
     // Disable output buffering
     setbuf(stdout, NULL);

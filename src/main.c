@@ -81,7 +81,7 @@ int zlib_decompress(FILE *objectFile, FILE *destFile){
             case Z_DATA_ERROR:
             case Z_MEM_ERROR:
                 (void)inflateEnd(&strm);
-                retrun Z_ERRNO;
+                return Z_ERRNO;
             default:
                 break;
             }

@@ -136,17 +136,19 @@ int main(int argc, char *argv[]) {
         fprintf(stdout, "cat-file command recieved for object with hash 0x%s", argv[3]);
         char fileName[41];
         char dir[100] = ".git/objects/";
-        for(int i = 0; i < 41; i++){
-            if(i==2){
-                fileName[i] = '/';
-                continue;
-            }
-            fileName[i] = argv[3][i];
-        }
-        strcat(dir, fileName);
+
+        snprintf(dir, sizeof(dir), ".git/objects/%.2s/%s", argv[3], argv[3]+2);
+        // for(int i = 0; i < 41; i++){
+        //     if(i==2){
+        //         fileName[i] = '/';
+        //         continue;
+        //     }
+        //     fileName[i] = argv[3][i];
+        // }
+        // strcat(dir, fileName);
         FILE *objectFile = fopen(dir, "rb");
         strcat(dir, "TMP");
-        FILE *destFile = fopen(dir, "wb"); // must delet later
+        FILE *destFile = fopen(dir, "w+b"); // must delet later
         cat_file(objectFile, destFile);
     }
      

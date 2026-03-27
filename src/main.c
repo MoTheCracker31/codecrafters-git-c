@@ -34,7 +34,8 @@ void cat_file(FILE *objectFile, FILE *destination){
     zlib_decompress(objectFile, destination);
     rewind(destination);
     unsigned size;
-    fscanf(destination, "%s ", buf);
+    char obj[6];
+    fscanf(destination, "%s ", obj);
     fscanf(destination, "%d", &size);
     char buf[size];
     while(fread(buf, sizeof(char), size, destination));

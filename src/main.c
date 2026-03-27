@@ -4,6 +4,7 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include "zlib.h"
+#include <assert.h>
 
 #define CHUNK 16384
 
@@ -62,7 +63,7 @@ int zlib_decompress(FILE *objectFile, FILE *destFile){
         strm.avail_in = fread(in, sizeof(char), CHUNK, objectFile);
         if (ferror(objectFile)){
             (void)deflateEnd(&strm);
-            retrun Z_ERRNO;
+            return Z_ERRNO;
         }
         if(strm.avail_in == 0) break;
         strm.next_in = in;

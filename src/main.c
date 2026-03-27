@@ -37,6 +37,7 @@ void cat_file(FILE *objectFile, FILE *destination){
     char obj[6];
     fscanf(destination, "%s ", obj);
     fscanf(destination, "%d", &size);
+    fseek(destination, 1, SEEK_CUR);
     char buf[size];
     fread(buf, sizeof(char), size, destination);
     fwrite(buf, sizeof(char), size, stdout);

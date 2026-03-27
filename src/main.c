@@ -3,7 +3,9 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <errno.h>
+#include "zlib.h"
 
+#define CHUNK 16384
 
 struct Blob{
     char* data;
@@ -20,6 +22,72 @@ struct Commit{
     char* commiter;
     struct Commit* parent;
 };
+
+
+void cat_file(FILE *objectFile, FILE *destination){
+    zlib_decompress(objectFile, destination);
+    char buf[1024];
+    fscanf(destination, "%s ", buf);
+    fprintf(stdout, "Object type is %s\n", buf);
+    fscanf(destination, "%d\0", buf);
+    fprintf(stdout, "%d\n", buf);
+    while(fscanf(destination, "%s", buf)){
+        fprintf(stdout, "%s", buf);
+    }
+}
+
+void zlib_decompress(FILE *objectFile, FILE *destFile){
+    unsigned have;
+    char in[CHUNK];
+    char out[CHUNK];
+    int ret;
+    z_stream strm;
+
+    strm.opaque = Z_NULL;
+    strm.zalloc = Z_NULL;
+    strm.zfree = Z_NULL;
+    strm.avail_in = 0;
+    strm.next_in = Z_NULL;
+    ret = inflateInit(&strm);
+    if(ret != Z_OK)
+        return ret;
+    /* Decompress until the end of the file*/
+    do
+    {
+        strm.avail_in = fread(in, sizeof(char), CHUNK, objectFile);
+        if (ferror(objectFile)){
+            (void)deflateEnd(&strm);
+            retrun Z_ERRNO;
+        }
+        if(strm.avail_in == 0) break;
+        strm.next_in = in;
+
+        do
+        {
+            strm.avail_out = CHUNK;
+            strm.next_out = out;
+            ret = inflate(&strm, Z_NO_FLUSH);
+            assert(ret != Z_STREAM_ERROR);
+            switch (ret)
+            {
+            case Z_NEED_DICT:
+                ret =  Z_DATA_ERROR;
+            case Z_DATA_ERROR:
+            case Z_MEM_ERROR:
+                (void)inflateEnd(&strm);
+                retrun Z_ERRNO;
+            default:
+                break;
+            }
+            have = CHUNK - strm.avail_out;
+            if(fwrite(out, sizeof(char), have, destFile) != have || ferror(destFile)){
+                (void)inflateEnd(&strm);
+                retrun Z_ERRNO;
+            }
+        } while (strm.avail_out == 0);
+        /* done when inflate() says it's done */
+    } while (ret != Z_STREAM_END);
+}
 
 int main(int argc, char *argv[]) {
     // Disable output buffering
@@ -55,7 +123,14 @@ int main(int argc, char *argv[]) {
         fclose(headFile);
         
         printf("Initialized git directory\n");
-    } else {
+    
+    }
+    else if (strcmp(command, "cat-file") == 0 && strcmp(argv[2], "-p") == 0)
+    {
+        fprintf(stdout, "cat-file command recieved for object with hash 0x%x", argv[3]);
+    }
+     
+    else {
         fprintf(stderr, "Unknown command %s\n", command);
         return 1;
     }

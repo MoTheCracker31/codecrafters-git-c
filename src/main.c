@@ -138,7 +138,7 @@ int main(int argc, char *argv[]) {
         char dir[100] = ".git/objects/";
         for(int i = 0; i < 41; i++){
             if(i==2){
-                fileName[i] = "/";
+                fileName[i] = '/';
                 continue;
             }
             fileName[i] = argv[3][i];

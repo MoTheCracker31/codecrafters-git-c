@@ -35,7 +35,7 @@ void cat_file(FILE *objectFile, FILE *destination){
     char buf[1024];
     fscanf(destination, "%s ", buf);
     fprintf(stdout, "Object type is %s\n", buf);
-    fscanf(destination, "%d\0", buf);
+    fscanf(destination, "%d", buf);
     fprintf(stdout, "%d\n", buf);
     while(fscanf(destination, "%s", buf)){
         fprintf(stdout, "%s", buf);
@@ -144,9 +144,9 @@ int main(int argc, char *argv[]) {
             fileName[i] = argv[3][i];
         }
         strcat(dir, fileName);
-        FILE *objectFile = fopen(dir, "r");
+        FILE *objectFile = fopen(dir, "rb");
         strcat(dir, "TMP");
-        FILE *destFile = fopen(dir, "w"); // must delet later
+        FILE *destFile = fopen(dir, "wb"); // must delet later
         cat_file(objectFile, destFile);
     }
      

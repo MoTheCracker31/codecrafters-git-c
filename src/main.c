@@ -25,7 +25,7 @@ struct Commit{
 
 
 
-void zlib_decompress(FILE *objectFile, FILE *destFile);
+int zlib_decompress(FILE *objectFile, FILE *destFile);
 void cat_file(FILE *objectFile, FILE *destination);
 
 
@@ -41,7 +41,7 @@ void cat_file(FILE *objectFile, FILE *destination){
     }
 }
 
-void zlib_decompress(FILE *objectFile, FILE *destFile){
+int zlib_decompress(FILE *objectFile, FILE *destFile){
     unsigned have;
     char in[CHUNK];
     char out[CHUNK];

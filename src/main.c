@@ -33,9 +33,10 @@ void cat_file(FILE *objectFile, FILE *destination);
 void cat_file(FILE *objectFile, FILE *destination){
     zlib_decompress(objectFile, destination);
     char buf[1024];
+    unsigned size;
     fscanf(destination, "%s ", buf);
-    fscanf(destination, "%d", buf);
-    while(fscanf(destination, "%s", buf)){
+    fscanf(destination, "%d", &size);
+    while(fread(buf, sizefo(char), 1024, destination)){
         fprintf(stdout, "%s", buf);
     }
 }
@@ -138,7 +139,7 @@ int main(int argc, char *argv[]) {
        
         FILE *objectFile = fopen(dir, "rb");
         strcat(dir, "TMP");
-        FILE *destFile = fopen(dir, "w+b"); // must delet later
+        FILE *destFile = fopen(dir, "wb+"); // must delet later
         cat_file(objectFile, destFile);
     }
      

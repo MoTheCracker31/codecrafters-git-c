@@ -137,12 +137,12 @@ int main(int argc, char *argv[]) {
         char path[100];
         for(int i = 0; i < 41; i++){
             if(i==2){
-                path[i]="/";
+                path[i] = "/";
                 continue;
             }
             path[i] = argv[3][i];
         }
-        *path = strcat(".git/objects/", path);
+        path = strcat(".git/objects/", path);
         FILE *objectFile = fopen(path, "r");
         FILE *destFile = fopen(".git/tmpObj/tmp", "w"); // must delet later
         cat_file(objectFile, destFile);

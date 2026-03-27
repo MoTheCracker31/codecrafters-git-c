@@ -88,7 +88,7 @@ int zlib_decompress(FILE *objectFile, FILE *destFile){
             have = CHUNK - strm.avail_out;
             if(fwrite(out, sizeof(char), have, destFile) != have || ferror(destFile)){
                 (void)inflateEnd(&strm);
-                retrun Z_ERRNO;
+                return Z_ERRNO;
             }
         } while (strm.avail_out == 0);
         /* done when inflate() says it's done */

@@ -145,7 +145,8 @@ int main(int argc, char *argv[]) {
         }
         strcat(dir, fileName);
         FILE *objectFile = fopen(dir, "r");
-        FILE *destFile = fopen(".git/tmpObj/tmp", "w"); // must delet later
+        strcat(dir, "TMP");
+        FILE *destFile = fopen(dir, "w"); // must delet later
         cat_file(objectFile, destFile);
     }
      

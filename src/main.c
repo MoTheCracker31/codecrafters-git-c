@@ -34,9 +34,7 @@ void cat_file(FILE *objectFile, FILE *destination){
     zlib_decompress(objectFile, destination);
     char buf[1024];
     fscanf(destination, "%s ", buf);
-    fprintf(stdout, "Object type is %s\n", buf);
     fscanf(destination, "%d", buf);
-    fprintf(stdout, "%d\n", buf);
     while(fscanf(destination, "%s", buf)){
         fprintf(stdout, "%s", buf);
     }
@@ -133,19 +131,11 @@ int main(int argc, char *argv[]) {
     }
     else if (strcmp(command, "cat-file") == 0 && strcmp(argv[2], "-p") == 0)
     {
-        fprintf(stdout, "cat-file command recieved for object with hash 0x%s", argv[3]);
         char fileName[41];
         char dir[100] = ".git/objects/";
 
         snprintf(dir, sizeof(dir), ".git/objects/%.2s/%s", argv[3], argv[3]+2);
-        // for(int i = 0; i < 41; i++){
-        //     if(i==2){
-        //         fileName[i] = '/';
-        //         continue;
-        //     }
-        //     fileName[i] = argv[3][i];
-        // }
-        // strcat(dir, fileName);
+       
         FILE *objectFile = fopen(dir, "rb");
         strcat(dir, "TMP");
         FILE *destFile = fopen(dir, "w+b"); // must delet later

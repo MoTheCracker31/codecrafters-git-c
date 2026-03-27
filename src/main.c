@@ -24,6 +24,11 @@ struct Commit{
 };
 
 
+
+void zlib_decompress(FILE *objectFile, FILE *destFile);
+void cat_file(FILE *objectFile, FILE *destination);
+
+
 void cat_file(FILE *objectFile, FILE *destination){
     zlib_decompress(objectFile, destination);
     char buf[1024];

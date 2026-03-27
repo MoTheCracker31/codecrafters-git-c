@@ -38,8 +38,8 @@ void cat_file(FILE *objectFile, FILE *destination){
     fscanf(destination, "%s ", obj);
     fscanf(destination, "%d", &size);
     char buf[size];
-    while(fread(buf, sizeof(char), size, destination));
-    fprintf(stdout, "%s\0", buf);
+    fread(buf, sizeof(char), size, destination);
+    fwrite(buf, sizeof(char), size, stdout);
 }
 
 int zlib_decompress(FILE *objectFile, FILE *destFile){

@@ -133,7 +133,7 @@ int main(int argc, char *argv[]) {
     }
     else if (strcmp(command, "cat-file") == 0 && strcmp(argv[2], "-p") == 0)
     {
-        fprintf(stdout, "cat-file command recieved for object with hash 0x%x", argv[3]);
+        fprintf(stdout, "cat-file command recieved for object with hash 0x%s", argv[3]);
         char fileName[41];
         char dir[100] = ".git/objects/";
         for(int i = 0; i < 41; i++){
@@ -144,7 +144,7 @@ int main(int argc, char *argv[]) {
             fileName[i] = argv[3][i];
         }
         strcat(dir, fileName);
-        FILE *objectFile = fopen(fileName, "r");
+        FILE *objectFile = fopen(dir, "r");
         FILE *destFile = fopen(".git/tmpObj/tmp", "w"); // must delet later
         cat_file(objectFile, destFile);
     }

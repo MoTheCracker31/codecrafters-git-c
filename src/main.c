@@ -36,7 +36,7 @@ void cat_file(FILE *objectFile, FILE *destination){
     unsigned size;
     fscanf(destination, "%s ", buf);
     fscanf(destination, "%d", &size);
-    while(fread(buf, sizefo(char), 1024, destination)){
+    while(fread(buf, sizeof(char), 1024, destination)){
         fprintf(stdout, "%s", buf);
     }
 }

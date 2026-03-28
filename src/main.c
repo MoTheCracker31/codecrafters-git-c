@@ -147,7 +147,7 @@ int main(int argc, char *argv[]) {
     }
 
     else if (strcmp(command, "hash-object") == 0 && strcmp(argv[2], "-w") == 0){
-        char *fileName = agrv[4];
+        char *fileName = argv[4];
     }
      
     else {

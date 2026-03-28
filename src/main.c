@@ -145,6 +145,10 @@ int main(int argc, char *argv[]) {
         FILE *destFile = fopen(dir, "wb+"); // must delet later
         cat_file(objectFile, destFile);
     }
+
+    else if (strcmp(command, "hash-object") == 0 && strcmp(argv[2], "-w") == 0){
+        char *fileName = agrv[4];
+    }
      
     else {
         fprintf(stderr, "Unknown command %s\n", command);

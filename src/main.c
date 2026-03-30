@@ -5,6 +5,8 @@
 #include <errno.h>
 #include "zlib.h"
 #include <assert.h>
+#include "platform.h"
+#include "hash-object.h"
 
 
 #define CHUNK 16384
@@ -113,11 +115,15 @@ int main(int argc, char *argv[]) {
         // You can use print statements as follows for debugging, they'll be visible when running tests.
         fprintf(stderr, "Logs from your program will appear here!\n");
 
-        // TODO: Uncomment the code below to pass the first stage
+        char objects_path[256];
+        char refs_path[256];
+
+        join_path(objects_path, sizeof(objects_path), ".git", "objects");
+        join_path(refs_path, sizeof(refs_path), ".git", "refs");
         
-        if (mkdir(".git", 0755) == -1 || 
-            mkdir(".git/objects", 0755) == -1 || 
-            mkdir(".git/refs", 0755) == -1) {
+        if (make_dir(".git") == -1 || 
+            make_dir(objects_path) == -1 || 
+            make_dir(refs_path) == -1) {
             fprintf(stderr, "Failed to create directories: %s\n", strerror(errno));
             return 1;
         }
@@ -147,7 +153,15 @@ int main(int argc, char *argv[]) {
     }
 
     else if (strcmp(command, "hash-object") == 0 && strcmp(argv[2], "-w") == 0){
-        char *fileName = argv[4];
+        char *hashed_ojbect = hash_object(argv[4]);
+        char *objectPath;
+        snprintf(objectPath, sizeof(hashed_ojbect)+1, "%2s/%s", objectPath, objectPath);
+
+        if(make_dir(objectPath) == -1){
+            fprintf(stderr, "hash-object failed to create object file: %s", strerror(errno));
+        }
+        
+
     }
      
     else {

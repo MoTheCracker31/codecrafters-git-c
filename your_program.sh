@@ -13,8 +13,11 @@ set -e # Exit early if any commands fail
 # - Edit this to change how your program compiles locally
 # - Edit .codecrafters/compile.sh to change how your program compiles remotely
 (
-  cd "$(dirname "$0")" # Ensure compile steps are run within the repository directory
-  cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake
+  cd "$(dirname "$0")"
+  cmake -G Ninja -B build -S . \
+  -DCMAKE_TOOLCHAIN_FILE="C:/vcpkg/scripts/buildsystems/vcpkg.cmake" \
+  -DVCPKG_TARGET_TRIPLET=x64-mingw-dynamic \
+  -DVCPKG_HOST_TRIPLET=x64-mingw-dynamic
   cmake --build ./build
 )
 

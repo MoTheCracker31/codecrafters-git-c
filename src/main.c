@@ -153,14 +153,61 @@ int main(int argc, char *argv[]) {
     }
 
     else if (strcmp(command, "hash-object") == 0 && strcmp(argv[2], "-w") == 0){
-        char *hashed_ojbect = hash_object(argv[4]);
-        char *objectPath;
-        snprintf(objectPath, sizeof(hashed_ojbect)+1, "%2s/%s", objectPath, objectPath);
 
-        if(make_dir(objectPath) == -1){
-            fprintf(stderr, "hash-object failed to create object file: %s", strerror(errno));
+        FILE *objectFile = fopen(argv[3], "r");
+        if (objectFile == NULL){
+            fprintf(stderr, "Error when trying to open object file: %s", strerror(errno));
+            return 1;
         }
+        /*Get the size of object file and declar buffer for the content of the file*/
+        fseek(objectFile, 0L, SEEK_END);
+        long contentSize = ftell(objectFile);
+        rewind(objectFile);
+        if(contentSize == -1){
+            fprintf(stderr, "Error happen when getting the size of the file: %s", strerror(errno));
+            return 1;
+        }
+        char objectContent[contentSize];
+        /*read the content of the file */
+        fread(objectContent, sizeof(char), contentSize, objectFile);
+        fclose(objectFile);
+
+        size_t headerSize = strlen("blob ") + sizeof(char) * 11; // 11 is the maximum number of characters needed to represent a long integer 
+        char fileHeader[headerSize];
+        sprintf(fileHeader, "blob %li\0", contentSize);
+
+        char *unhashedContent = (char *)malloc(sizeof(char)*(contentSize + headerSize));
+        memset(unhashedContent, 0, sizeof(char)*(contentSize + headerSize));
+
+        memcpy(unhashedContent, fileHeader, strlen(fileHeader)+1);
+        memcpy(&unhashedContent[strlen(fileHeader)+1], objectContent, contentSize);
+        long unhashedContentLen = contentSize + strlen(fileHeader) + 1;
+        /*Hash the content of the file with its header*/
+        unsigned char *hashed_object = hash_object(unhashedContent, unhashedContentLen); // TODO : hashed_object must be freed
+        free(unhashedContent);
+        // TODO : correct the below code
+        unsigned char objectPath[SHA1_SIZE * 2 + 2 + 10];
+        unsigned char objectHash[SHA1_SIZE * 2 + 1];
+        char objectDir[16] = ".git\\objects\\";
         
+
+        for(int i = 0; i < SHA1_SIZE + 1; i++){
+            sprintf(&objectHash[i*2], "%02x", hashed_object[i]);
+        }
+        objectHash[SHA1_SIZE*2] = '\0';
+        free(hashed_object);
+
+        objectHash[SHA1_SIZE * 2 + 2  - 1] = '\0';
+        fprintf(stdout, "%s\n", objectHash);
+
+        snprintf(objectPath, sizeof(objectPath), ".git%cobjects%c%.2s%c%s", PATH_SEP_CHAR, PATH_SEP_CHAR, objectHash, PATH_SEP_CHAR, objectHash + 2);
+
+        strncat(objectDir, objectHash, 2);
+
+        if(make_dir(objectDir) == -1 && errno != EEXIST){
+            fprintf(stderr, "hash-object failed to create object file: %s\n", strerror(errno));
+            return 1;
+        }
 
     }
      

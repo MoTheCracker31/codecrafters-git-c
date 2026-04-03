@@ -3,16 +3,16 @@
 #include <string.h>
 
 
-unsigned char* hash_object(const char* msg){
-
+unsigned char* hash_object(const char* msg, long msgLen){
 
     unsigned char *hashedObj = (unsigned char *)malloc(SHA1_SIZE * sizeof(unsigned char));
+    memset(hashedObj, 0, SHA1_SIZE * sizeof(unsigned char));
     if (hashedObj == NULL) return NULL;
     
     EVP_MD_CTX *mdctx = EVP_MD_CTX_create();
     if(!mdctx) return NULL;
     int md_len;
-    if(EVP_DigestInit_ex(mdctx, EVP_sha1(), NULL) == 0 || EVP_DigestUpdate(mdctx, msg, strlen(msg)) == 0 || EVP_DigestFinal(mdctx, hashedObj, &md_len) == 0){
+    if(EVP_DigestInit_ex(mdctx, EVP_sha1(), NULL) == 0 || EVP_DigestUpdate(mdctx, msg, msgLen) == 0 || EVP_DigestFinal(mdctx, hashedObj, &md_len) == 0){
         EVP_MD_CTX_free(mdctx);
         free(hashedObj);    
         return NULL;
@@ -21,4 +21,8 @@ unsigned char* hash_object(const char* msg){
     EVP_MD_CTX_free(mdctx);
 
     return hashedObj;
+}
+
+void zlib_compress(char *content){
+    
 }

@@ -152,7 +152,7 @@ int main(int argc, char *argv[]) {
         cat_file(objectFile, destFile);
     }
 
-    else if (strcmp(command, "hash-object") == 0 && strcmp(argv[2], "-w") == 0){
+    else if (strcmp(command, "hash-object") == 0 && strcmp(argv[2], "-w") == 0 &&){
 
         FILE *objectFile = fopen(argv[3], "r");
         if (objectFile == NULL){
@@ -181,12 +181,12 @@ int main(int argc, char *argv[]) {
 
         memcpy(unhashedContent, fileHeader, strlen(fileHeader)+1);
         memcpy(&unhashedContent[strlen(fileHeader)+1], objectContent, contentSize);
-        long unhashedContentLen = contentSize + strlen(fileHeader) + 1;
+        unsigned long unhashedContentLen = contentSize + strlen(fileHeader) + 1;
         /*Hash the content of the file with its header*/
-        unsigned char *hashed_object = hash_object(unhashedContent, unhashedContentLen); // TODO : hashed_object must be freed
-        free(unhashedContent);
-        // TODO : correct the below code
-        unsigned char objectPath[SHA1_SIZE * 2 + 2 + 10];
+        unsigned char *hashed_object = hash_object(unhashedContent, unhashedContentLen);
+        
+        
+        unsigned char objectPath[SHA1_SIZE * 2 + 2 + 20];
         unsigned char objectHash[SHA1_SIZE * 2 + 1];
         char objectDir[16] = ".git\\objects\\";
         
@@ -209,6 +209,14 @@ int main(int argc, char *argv[]) {
             return 1;
         }
 
+        FILE *destFile = fopen(objectPath, "wb");
+        if(destFile == NULL || ferror(destFile)){
+            fprintf(stderr, "Error opening destination file: %s", strerror(errno));
+            return 1;
+        }
+        zlib_compress(unhashedContent, unhashedContentLen, destFile);
+        free(unhashedContent);
+        fclose(destFile);
     }
      
     else {

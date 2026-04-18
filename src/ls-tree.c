@@ -39,6 +39,9 @@ void ls_tree(FILE *dest)
         case 120000:
             memcpy(type, "link", sizeof("link"));
             break;
+        case 040000:
+            memccpy(type, "tree", sizeof("tree"));
+            break;
         default:
             memcpy(type, "N/A", sizeof("N/A"));
             break;

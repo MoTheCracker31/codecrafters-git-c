@@ -163,9 +163,9 @@ int main(int argc, char *argv[])
 
     else if (strcmp(command, "ls-tree") == 0)
     {
-        if (argc < 3 || strlen(argv[2]) < 40)
+        if (argc < 3 || strlen(argv[2]) != 40)
         {
-            fprintf(stderr, "Must provide SHA hash of the tree object");
+            fprintf(stderr, "Must provide a correct SHA1 hash of the tree object");
             return 1;
         }
         char path[100];

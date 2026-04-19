@@ -2,7 +2,7 @@
 #include "ls-tree.h"
 #include "hash-object.h"
 
-void ls_tree(FILE *dest)
+int ls_tree(FILE *dest)
 {
     unsigned int cnt;
     char objectFileType[10];
@@ -17,6 +17,12 @@ void ls_tree(FILE *dest)
     // Skip the first line in the file
     fscanf(dest, "%s %lu\0\n", objectFileType, &objectFileSize);
 
+    if (strcmp(objectFileType, "tree") != 0)
+    {
+        fprintf(stderr, "fatal: not a tree object\n");
+        return 128;
+    }
+
     while (true)
     {
         cnt = fscanf(dest, "%lu", &mode); // doesn't work correctly.
@@ -30,17 +36,15 @@ void ls_tree(FILE *dest)
 
         switch (mode)
         {
+        case 120000:
         case 100644:
             memcpy(type, "blob", sizeof("blob"));
             break;
         case 100755:
             memcpy(type, "exec", sizeof("exec"));
             break;
-        case 120000:
-            memcpy(type, "link", sizeof("link"));
-            break;
-        case 040000:
-            memccpy(type, "tree", sizeof("tree"));
+        case 40000:
+            memcpy(type, "tree", sizeof("tree"));
             break;
         default:
             memcpy(type, "N/A", sizeof("N/A"));
@@ -72,7 +76,9 @@ void ls_tree(FILE *dest)
             sprintf(&shaHash[cnt * 2], "%.02x", rawHash[cnt]);
         }
         shaHash[SHA1_SIZE * 2 + 1] = '\0';
-        fprintf(stdout, "%.06d %s %s %s\n", mode, type, shaHash, fileName);
+        fprintf(stdout, "%.06d %s %s\t%s\n", mode, type, shaHash, fileName);
         cnt = 0;
     }
+
+    return 0;
 }

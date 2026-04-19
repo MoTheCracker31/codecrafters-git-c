@@ -2,6 +2,6 @@
 #define LS_TREE_H
 #include <stdio.h>
 
-void ls_tree(FILE *dest);
+int ls_tree(FILE *dest);
 
 #endif // LS_TREE_H

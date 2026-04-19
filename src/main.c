@@ -172,10 +172,20 @@ int main(int argc, char *argv[])
         snprintf(path, sizeof(path), ".git/objects/%.2s/%s", argv[2], argv[2] + 2);
 
         FILE *treeFile = fopen(path, "rb");
+        if (treeFile == NULL && errno == ENOFILE)
+        {
+            fprintf(stderr, "fatal: not a tree object\n");
+            return 128;
+        }
+
         FILE *tmpFile = fopen("./tmpTreeFile", "wb+");
 
         zlib_decompress(treeFile, tmpFile);
-        ls_tree(tmpFile);
+
+        int ls_tree_returncode = ls_tree(tmpFile);
+        if (ls_tree_returncode != 0)
+            return ls_tree_returncode;
+
         fclose(treeFile);
         fclose(tmpFile);
         remove("./tmpTreeFile");

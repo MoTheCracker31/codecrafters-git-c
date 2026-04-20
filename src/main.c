@@ -88,6 +88,7 @@ int zlib_decompress(FILE *objectFile, FILE *destFile)
                 ret = Z_DATA_ERROR;
             case Z_DATA_ERROR:
             case Z_MEM_ERROR:
+                fprintf(stderr, "error: inflate: data stream error (%s)\n", strm.msg);
                 (void)inflateEnd(&strm);
                 return Z_ERRNO;
             default:
@@ -180,7 +181,12 @@ int main(int argc, char *argv[])
 
         FILE *tmpFile = fopen("./tmpTreeFile", "wb+");
 
-        zlib_decompress(treeFile, tmpFile);
+        if (zlib_decompress(treeFile, tmpFile) == Z_ERRNO)
+        {
+            fprintf(stderr, "error: corrupt loose object '%s'\n", argv[2]);
+            fprintf(stderr, "fatal: loose object %s (stored in %s) is corrupt\n", argv[2], path);
+            return 128;
+        }
 
         int ls_tree_returncode = ls_tree(tmpFile);
         if (ls_tree_returncode != 0)

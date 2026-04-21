@@ -8,6 +8,7 @@
 #include "platform.h"
 #include "hash-object.h"
 #include "ls-tree.h"
+#include "write-tree.h"
 
 #define CHUNK 16384
 
@@ -149,6 +150,18 @@ int main(int argc, char *argv[])
 
         printf("Initialized git directory\n");
     }
+
+    else if (strcmp(command, "write-tree") == 0)
+    {
+        FILE *git_index = fopen(".git/index", "rb");
+        if (git_index == NULL)
+        {
+            fprintf(stderr, "Couldn't open index file: %s", strerror(errno));
+            retrun 1;
+        }
+        write_tree(git_index);
+    }
+
     else if (strcmp(command, "cat-file") == 0 && strcmp(argv[2], "-p") == 0)
     {
         char fileName[41];

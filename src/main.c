@@ -8,6 +8,7 @@
 #include "platform.h"
 #include "hash-object.h"
 #include "ls-tree.h"
+#include "write-tree.h"
 
 #define CHUNK 16384
 
@@ -88,6 +89,7 @@ int zlib_decompress(FILE *objectFile, FILE *destFile)
                 ret = Z_DATA_ERROR;
             case Z_DATA_ERROR:
             case Z_MEM_ERROR:
+                fprintf(stderr, "error: inflate: data stream error (%s)\n", strm.msg);
                 (void)inflateEnd(&strm);
                 return Z_ERRNO;
             default:
@@ -148,6 +150,18 @@ int main(int argc, char *argv[])
 
         printf("Initialized git directory\n");
     }
+
+    else if (strcmp(command, "write-tree") == 0)
+    {
+        FILE *git_index = fopen(".git/index", "rb");
+        if (git_index == NULL)
+        {
+            fprintf(stderr, "Couldn't open index file: %s", strerror(errno));
+            return 1; // TODO: Return actual error code.
+        }
+        read_git_index_file(git_index);
+    }
+
     else if (strcmp(command, "cat-file") == 0 && strcmp(argv[2], "-p") == 0)
     {
         char fileName[41];
@@ -180,7 +194,12 @@ int main(int argc, char *argv[])
 
         FILE *tmpFile = fopen("./tmpTreeFile", "wb+");
 
-        zlib_decompress(treeFile, tmpFile);
+        if (zlib_decompress(treeFile, tmpFile) == Z_ERRNO)
+        {
+            fprintf(stderr, "error: corrupt loose object '%s'\n", argv[2]);
+            fprintf(stderr, "fatal: loose object %s (stored in %s) is corrupt\n", argv[2], path);
+            return 128;
+        }
 
         int ls_tree_returncode = ls_tree(tmpFile);
         if (ls_tree_returncode != 0)

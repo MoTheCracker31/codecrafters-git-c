@@ -53,3 +53,9 @@ dkms.conf
 
 build
 vcpkg_installed
+
+# environment files + debug building
+.venv/
+.vscode/
+CmakePresets.json
+build_debug.sh

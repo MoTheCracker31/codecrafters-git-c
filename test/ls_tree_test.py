@@ -5,6 +5,7 @@ import sys
 import stat
 import pathlib
 import tempfile
+import random
 
 
 @pytest.fixture
@@ -137,6 +138,32 @@ def test_nontree_object(git_repo):
                           cwd=git_repo, capture_output=True, text=True).stdout.strip()
     my_git_result = my_git(["ls-tree", blob], git_repo)
     real_git_result = real_git(["ls-tree", blob], git_repo)
+
+    assert my_git_result.stderr.strip() == real_git_result.stderr.strip()
+    assert my_git_result.returncode == real_git_result.returncode
+
+
+def test_corrupted_object(git_repo):
+
+    (git_repo / f"test.txt").write_text("corrupted object test")
+    subprocess.run(["git", "add", "."], cwd=git_repo)
+    subprocess.run(
+        ["git", "commit", "-m", "corrupted object test"], cwd=git_repo)
+    sha = subprocess.run(["git", "rev-parse", "HEAD^{tree}"],
+                         cwd=git_repo, text=True, capture_output=True).stdout.strip()
+    filePath = f".git/objects/{sha[:2]}/{sha[2:]}"
+    os.chmod(git_repo / filePath, 0o666)
+    with open(git_repo / filePath, "rb") as fd:
+        data = bytearray(fd.read())
+
+    middle = len(data) // 2
+    data[middle] = (data[middle] + 1) % 256
+
+    with open(git_repo / filePath, "wb") as fd:
+        fd.write(data)
+
+    my_git_result = my_git(["ls-tree", sha], cwd=git_repo)
+    real_git_result = real_git(["ls-tree", sha], cwd=git_repo)
 
     assert my_git_result.stderr.strip() == real_git_result.stderr.strip()
     assert my_git_result.returncode == real_git_result.returncode

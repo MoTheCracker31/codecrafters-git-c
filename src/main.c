@@ -157,9 +157,9 @@ int main(int argc, char *argv[])
         if (git_index == NULL)
         {
             fprintf(stderr, "Couldn't open index file: %s", strerror(errno));
-            retrun 1;
+            return 1; // TODO: Return actual error code.
         }
-        write_tree(git_index);
+        read_git_index_file(git_index);
     }
 
     else if (strcmp(command, "cat-file") == 0 && strcmp(argv[2], "-p") == 0)

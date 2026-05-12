@@ -12,9 +12,9 @@ int read_git_index_file(FILE *index)
     unsigned int osFilePathLimit = 255;
     short fileNameLen;
 
-    readBytes = fread(&indexMagicNumber, sizeof(unsigned int), 1, index);
-    readBytes += fread(&versionNumber, sizeof(unsigned int), 1, index);
-    readBytes += fread(&numberOfEnteries, sizeof(unsigned int), 1, index);
+    readBytes = sizeof(unsigned int) * fread(&indexMagicNumber, sizeof(unsigned int), 1, index);
+    readBytes += sizeof(unsigned int) * fread(&versionNumber, sizeof(unsigned int), 1, index);
+    readBytes += sizeof(unsigned int) * fread(&numberOfEnteries, sizeof(unsigned int), 1, index);
     if (readBytes != 3 * sizeof(unsigned int))
     {
         fprintf(index, "Error reading the metadata of index file");
@@ -36,7 +36,7 @@ int read_git_index_file(FILE *index)
     {
         fseek(index, 6 * sizeof(unsigned int), SEEK_CUR);
         readBytes = 6 * sizeof(unsigned char);
-        readBytes += fread(&entry[i].mode, sizeof(unsigned int), 1, index);
+        readBytes += sizeof(unsigned int) * fread(&entry[i].mode, sizeof(unsigned int), 1, index);
         fseek(index, 3 * sizeof(unsigned int), SEEK_CUR);
         readBytes += 3 * sizeof(unsigned int);
         if (fread(entry[i].sha, sizeof(unsigned char), SHA1_SIZE, index) != SHA1_SIZE)

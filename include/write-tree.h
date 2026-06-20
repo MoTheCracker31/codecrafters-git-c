@@ -17,6 +17,13 @@ typedef struct
     unsigned short flag;
 } indexEntryFixed;
 
+typedef struct
+{
+    indexEntryFixed *entries;
+    char **fileNames;
+    int count;
+} GitIndex;
+
 int read_git_index_file(FILE *index);
 
 #endif // WRITE_TREE_H

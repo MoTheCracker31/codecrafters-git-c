@@ -59,3 +59,8 @@ vcpkg_installed
 .vscode/
 CmakePresets.json
 build_debug.sh
+
+# Python test cache
+__pycache__/
+*.pyc
+.pytest_cache/

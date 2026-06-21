@@ -14,3 +14,4 @@ target_include_directories(git PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
 target_link_libraries(git PRIVATE OpenSSL::Crypto)
 target_link_libraries(git PRIVATE ZLIB::ZLIB)
+target_link_libraries(git PRIVATE ws2_32)

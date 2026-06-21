@@ -156,10 +156,19 @@ int main(int argc, char *argv[])
         FILE *git_index = fopen(".git/index", "rb");
         if (git_index == NULL)
         {
+            // No index (nothing staged): real git prints the empty-tree SHA and
+            // exits 0. 4b825dc6... is the well-known SHA-1 of an empty tree.
+            if (errno == ENOENT)
+            {
+                printf("4b825dc642cb6eb9a060e54bf8d69288fbee4904\n");
+                return 0;
+            }
             fprintf(stderr, "Couldn't open index file: %s", strerror(errno));
-            return 1; // TODO: Return actual error code.
+            return 1;
         }
-        read_git_index_file(git_index);
+        int rc = read_git_index_file(git_index);
+        fclose(git_index);
+        return rc;
     }
 
     else if (strcmp(command, "cat-file") == 0 && strcmp(argv[2], "-p") == 0)

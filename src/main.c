@@ -9,6 +9,7 @@
 #include "hash-object.h"
 #include "ls-tree.h"
 #include "write-tree.h"
+#include "commit-tree.h"
 
 #define CHUNK 16384
 
@@ -288,6 +289,34 @@ int main(int argc, char *argv[])
         zlib_compress(unhashedContent, unhashedContentLen, destFile);
         free(unhashedContent);
         fclose(destFile);
+    }
+
+    else if (strcmp(command, "commit-tree") == 0)
+    {
+        /* Usage: commit-tree <tree_sha> [-p <parent_sha>]... [-m <message>] */
+        const char *tree_sha = NULL;
+        const char *message = NULL;
+        /* At most one parent per remaining argv entry, so argc is a safe bound. */
+        const char *parent_shas[argc];
+        int parent_count = 0;
+
+        for (int i = 2; i < argc; i++)
+        {
+            if (strcmp(argv[i], "-p") == 0 && i + 1 < argc)
+                parent_shas[parent_count++] = argv[++i];
+            else if (strcmp(argv[i], "-m") == 0 && i + 1 < argc)
+                message = argv[++i];
+            else if (tree_sha == NULL)
+                tree_sha = argv[i];
+        }
+
+        if (tree_sha == NULL)
+        {
+            fprintf(stderr, "Usage: ./your_program.sh commit-tree <tree_sha> [-p <parent_sha>]... -m <message>\n");
+            return 1;
+        }
+
+        return commit_tree(tree_sha, parent_shas, parent_count, message);
     }
 
     else
